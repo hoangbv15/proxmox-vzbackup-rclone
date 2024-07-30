@@ -11,6 +11,7 @@ _bdir="$dumpdir"
 rcloneroot="$dumpdir/rclone"
 timepath="$(date +%Y)/$(date +%m)/$(date +%d)"
 rclonedir="$rcloneroot/$timepath"
+remotevzdumpsdir="vzdumps"
 COMMAND=${1}
 rehydrate=${2} #enter the date you want to rehydrate in the following format: YYYY/MM/DD
 if [ ! -z "${3}" ];then
@@ -25,7 +26,7 @@ if [[ ${COMMAND} == 'rehydrate' ]]; then
     #echo "For example, today would be: $timepath"
     #read -p 'Rehydrate Date => ' rehydrate
     rclone --config /root/.config/rclone/rclone.conf \
-    --drive-chunk-size=32M copy $rcremote:/$rehydrate$CMDARCHIVE $dumpdir \
+    --drive-chunk-size=32M copy $rcremote:/$rehydrate$CMDARCHIVE/$remotevzdumpsdir $dumpdir \
     -v --stats=60s --transfers=16 --checkers=16
 fi
 
@@ -105,7 +106,7 @@ if [[ ${COMMAND} == 'full-backup' || ${COMMAND} == 'vzdumps-backup' ]]; then
             [ -f "$i" ] || break
             echo "rcloning $i"
             rclone --config /root/.config/rclone/rclone.conf \
-                    --drive-chunk-size=32M copy $i $rcremote:/$timepathSnapshot/vzdumps \
+                    --drive-chunk-size=32M copy $i $rcremote:/$timepathSnapshot/$remotevzdumpsdir \
                     -v --stats=60s --transfers=16 --checkers=16
         done
     }
