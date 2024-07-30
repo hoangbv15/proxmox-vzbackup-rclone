@@ -3,6 +3,7 @@
 
 ############ /START CONFIG
 dumpdir="/mnt/pve/Samsung-4TB/dump" # Set this to where your vzdump files are stored
+rcremote="pcloud" # Set this to your rclone remote
 # MAX_AGE=3 # This is the age in days to keep local backup copies. Local backups older than this are deleted.
 ############ /END CONFIG
 
@@ -24,7 +25,7 @@ if [[ ${COMMAND} == 'rehydrate' ]]; then
     #echo "For example, today would be: $timepath"
     #read -p 'Rehydrate Date => ' rehydrate
     rclone --config /root/.config/rclone/rclone.conf \
-    --drive-chunk-size=32M copy pcloud:/$rehydrate$CMDARCHIVE $dumpdir \
+    --drive-chunk-size=32M copy $rcremote:/$rehydrate$CMDARCHIVE $dumpdir \
     -v --stats=60s --transfers=16 --checkers=16
 fi
 
@@ -40,7 +41,7 @@ if [[ ${COMMAND} == 'backup-end' ]]; then
     echo "rcloning $rclonedir"
     #ls $rclonedir
     rclone --config /root/.config/rclone/rclone.conf \
-    --drive-chunk-size=32M copy $tarfile pcloud:/$timepath \
+    --drive-chunk-size=32M copy $tarfile $rcremote:/$timepath \
     -v --stats=60s --transfers=16 --checkers=16
 fi
 
@@ -49,7 +50,7 @@ if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
     
     echo "Creating ramdisk to hold the backup files"
     mkdir -p /mnt/ramdisk
-    mount -t tmpfs -o size=10G tmpfs /mnt/ramdisk
+    mount -t tmpfs -o size=2G tmpfs /mnt/ramdisk
     
     _tdir=${TMP_DIR:-/mnt/ramdisk}
     _tdir=$(mktemp -d $_tdir/proxmox-XXXXXXXX)
@@ -82,7 +83,7 @@ if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
     echo "rcloning $_filename4"
     #ls $rclonedir
     rclone --config /root/.config/rclone/rclone.conf \
-    --drive-chunk-size=32M move $_filename4 pcloud:/$timepath \
+    --drive-chunk-size=32M move $_filename4 $rcremote:/$timepath \
     -v --stats=60s --transfers=16 --checkers=16
 
     #rm -rfv $rcloneroot
