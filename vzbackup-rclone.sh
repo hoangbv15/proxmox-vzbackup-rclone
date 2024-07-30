@@ -34,7 +34,7 @@ fi
 #     find $dumpdir -type f -mtime +$MAX_AGE -exec /bin/rm -f {} \;
 # fi
 
-# if [[ ${COMMAND} == 'backup-end' || ${COMMAND} == 'manual-backup']]; then
+# if [[ ${COMMAND} == 'backup-end' || ${COMMAND} == 'manual-backup' ]]; then
 #     echo "Backing up $tarfile to remote storage"
 #     #mkdir -p $rclonedir
 #     #cp -v $tarfile $rclonedir
@@ -45,7 +45,7 @@ fi
 #     -v --stats=60s --transfers=16 --checkers=16
 # fi
 
-if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'full-backup']]; then
+if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'full-backup' ]]; then
     echo "Backing up main PVE configs"
     
     echo "Creating ramdisk to hold the backup files"
@@ -94,7 +94,7 @@ if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'fu
     umount /mnt/ramdisk/
 fi
 
-if [[ ${COMMAND} == 'full-backup' || ${COMMAND} == 'vzdumps-backup']]; then
+if [[ ${COMMAND} == 'full-backup' || ${COMMAND} == 'vzdumps-backup' ]]; then
     # Upload vzdumps
     cd $dumpdir
     timepathSnapshot="$timepath"
