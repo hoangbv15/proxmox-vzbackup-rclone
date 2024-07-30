@@ -2,8 +2,8 @@
 # ./vzbackup-rclone.sh rehydrate YYYY/MM/DD file_name_encrypted.bin
 
 ############ /START CONFIG
-dumpdir="/mnt/pve/pvebackups01/dump" # Set this to where your vzdump files are stored
-MAX_AGE=3 # This is the age in days to keep local backup copies. Local backups older than this are deleted.
+dumpdir="/mnt/pve/Samsung-4TB/dump" # Set this to where your vzdump files are stored
+# MAX_AGE=3 # This is the age in days to keep local backup copies. Local backups older than this are deleted.
 ############ /END CONFIG
 
 _bdir="$dumpdir"
@@ -28,10 +28,10 @@ if [[ ${COMMAND} == 'rehydrate' ]]; then
     -v --stats=60s --transfers=16 --checkers=16
 fi
 
-if [[ ${COMMAND} == 'job-start' ]]; then
-    echo "Deleting backups older than $MAX_AGE days."
-    find $dumpdir -type f -mtime +$MAX_AGE -exec /bin/rm -f {} \;
-fi
+# if [[ ${COMMAND} == 'job-start' ]]; then
+#     echo "Deleting backups older than $MAX_AGE days."
+#     find $dumpdir -type f -mtime +$MAX_AGE -exec /bin/rm -f {} \;
+# fi
 
 if [[ ${COMMAND} == 'backup-end' ]]; then
     echo "Backing up $tarfile to remote storage"
@@ -46,7 +46,12 @@ fi
 
 if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
     echo "Backing up main PVE configs"
-    _tdir=${TMP_DIR:-/var/tmp}
+    
+    echo "Creating ramdisk to hold the backup files"
+    mkdir -p /mnt/ramdisk
+    mount -t tmpfs -o size=512m tmpfs /mnt/ramdisk
+    
+    _tdir=${TMP_DIR:-/mnt/ramdisk}
     _tdir=$(mktemp -d $_tdir/proxmox-XXXXXXXX)
     function clean_up {
         echo "Cleaning up"
