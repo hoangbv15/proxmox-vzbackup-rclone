@@ -107,7 +107,7 @@ if [[ ${COMMAND} == 'full-backup' || ${COMMAND} == 'vzdumps-backup' ]]; then
             rclone --config /root/.config/rclone/rclone.conf \
                     --drive-chunk-size=32M copy $i $rcremote:/$timepathSnapshot/vzdumps \
                     -v --stats=60s --transfers=16 --checkers=16
-        }
+        done
     }
 
     rclone_upload "*.vma.zst"
