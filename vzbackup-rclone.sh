@@ -45,7 +45,7 @@ fi
 #     -v --stats=60s --transfers=16 --checkers=16
 # fi
 
-if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'manual-backup']]; then
+if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'full-backup']]; then
     echo "Backing up main PVE configs"
     
     echo "Creating ramdisk to hold the backup files"
@@ -94,8 +94,8 @@ if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'ma
     umount /mnt/ramdisk/
 fi
 
-if [[ ${COMMAND} == 'manual-backup']]; then
-    # Upload gzdumps
+if [[ ${COMMAND} == 'full-backup' || ${COMMAND} == 'vzdumps-backup']]; then
+    # Upload vzdumps
     cd $dumpdir
     timepathSnapshot="$timepath"
     for i in *.vma.zst; do
