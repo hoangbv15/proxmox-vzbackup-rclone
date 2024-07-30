@@ -49,7 +49,7 @@ if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
     
     echo "Creating ramdisk to hold the backup files"
     mkdir -p /mnt/ramdisk
-    mount -t tmpfs -o size=512m tmpfs /mnt/ramdisk
+    mount -t tmpfs -o size=10G tmpfs /mnt/ramdisk
     
     _tdir=${TMP_DIR:-/mnt/ramdisk}
     _tdir=$(mktemp -d $_tdir/proxmox-XXXXXXXX)
@@ -86,4 +86,6 @@ if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
     -v --stats=60s --transfers=16 --checkers=16
 
     #rm -rfv $rcloneroot
+
+    umount /mnt/ramdisk/
 fi
