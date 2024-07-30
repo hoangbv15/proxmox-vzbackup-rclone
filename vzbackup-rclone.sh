@@ -99,11 +99,18 @@ if [[ ${COMMAND} == 'full-backup' || ${COMMAND} == 'vzdumps-backup' ]]; then
     cd $dumpdir
     timepathSnapshot="$timepath"
     echo "rcloning vzdumps"
-    for i in *.vma.zst; do
-        [ -f "$i" ] || break
-        echo "rcloning $i"
-        rclone --config /root/.config/rclone/rclone.conf \
-        --drive-chunk-size=32M copy $i $rcremote:/$timepathSnapshot \
-        -v --stats=60s --transfers=16 --checkers=16
-    done
+
+    rclone_upload () {
+        for i in $1; do
+            [ -f "$i" ] || break
+            echo "rcloning $i"
+            rclone --config /root/.config/rclone/rclone.conf \
+                    --drive-chunk-size=32M copy $i $rcremote:/$timepathSnapshot/vzdumps \
+                    -v --stats=60s --transfers=16 --checkers=16
+        }
+    }
+
+    rclone_upload "*.vma.zst"
+    rclone_upload "*.notes"
+    rclone_upload "*.log"
 fi
