@@ -34,18 +34,18 @@ fi
 #     find $dumpdir -type f -mtime +$MAX_AGE -exec /bin/rm -f {} \;
 # fi
 
-if [[ ${COMMAND} == 'backup-end' ]]; then
-    echo "Backing up $tarfile to remote storage"
-    #mkdir -p $rclonedir
-    #cp -v $tarfile $rclonedir
-    echo "rcloning $rclonedir"
-    #ls $rclonedir
-    rclone --config /root/.config/rclone/rclone.conf \
-    --drive-chunk-size=32M copy $tarfile $rcremote:/$timepath \
-    -v --stats=60s --transfers=16 --checkers=16
-fi
+# if [[ ${COMMAND} == 'backup-end' || ${COMMAND} == 'manual-backup']]; then
+#     echo "Backing up $tarfile to remote storage"
+#     #mkdir -p $rclonedir
+#     #cp -v $tarfile $rclonedir
+#     echo "rcloning $rclonedir"
+#     #ls $rclonedir
+#     rclone --config /root/.config/rclone/rclone.conf \
+#     --drive-chunk-size=32M copy $tarfile $rcremote:/$timepath \
+#     -v --stats=60s --transfers=16 --checkers=16
+# fi
 
-if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
+if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'manual-backup']]; then
     echo "Backing up main PVE configs"
     
     echo "Creating ramdisk to hold the backup files"
@@ -78,15 +78,30 @@ if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
 
     # copy config archive to backup folder
     #mkdir -p $rclonedir
-    cp -v $_filename4 $_bdir/
+    # cp -v $_filename4 $_bdir/
     #cp -v $_filename4 $rclonedir/
+
+    currentDir=${pwd}
+    cd $_tdir
     echo "rcloning $_filename4"
     #ls $rclonedir
     rclone --config /root/.config/rclone/rclone.conf \
     --drive-chunk-size=32M move $_filename4 $rcremote:/$timepath \
     -v --stats=60s --transfers=16 --checkers=16
-
+    cd $currentDir
     #rm -rfv $rcloneroot
 
     umount /mnt/ramdisk/
+fi
+
+if [[ ${COMMAND} == 'manual-backup']]; then
+    # Upload gzdumps
+    cd $dumpdir
+    timepathSnapshot="$timepath"
+    for i in *.vma.zst; do
+        [ -f "$i" ] || break
+        rclone --config /root/.config/rclone/rclone.conf \
+        --drive-chunk-size=32M copy $i $rcremote:/$timepathSnapshot \
+        -v --stats=60s --transfers=16 --checkers=16
+    done
 fi
