@@ -72,7 +72,7 @@ if [[ ${COMMAND} == 'env-backup' || ${COMMAND} == 'full-backup' ]]; then
     umount /mnt/ramdisk/
 fi
 
-if [[ ${COMMAND} == 'vzdumps-backup' || ${COMMAND} == 'full-backup' || ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
+if [[ ${COMMAND} == 'dump-backup' || ${COMMAND} == 'full-backup' || ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
     # Upload vzdumps
     cd $dumpdir
     echo "rcloning vzdumps"
