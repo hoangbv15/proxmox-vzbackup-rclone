@@ -25,7 +25,7 @@ git clone https://github.com/hoangbv15/proxmox-vzbackup-rclone.git
 chmod +x /root/proxmox-vzbackup-rclone/vzbackup-rclone.sh
 ```
 
-3. Edit vzbackup-rclone.sh and set both `$dumpdir` and `$MAX_AGE` at the top of the file. 
+3. Edit vzbackup-rclone.sh and set both `$dumpdir` and `$rcremote` at the top of the file. 
 
 4. Open /etc/vzdump.conf, uncomment the `script:` line and set that to `/root/proxmox-vzbackup-rclone/vzbackup-rclone.sh`:
 ```
@@ -87,19 +87,11 @@ TASK OK
 
 ## Rehydrate (restore) old backups
 
-At some point, it'll be very likely that you'll need to pull old backups from your rclone remote that have been removed from the local proxmox server. This can be done by passing the `rehydrate` parameter to the vzbackup-rclone.sh script:
+At some point, it'll be very likely that you'll need to pull old backups from your rclone remote that have been removed from the local proxmox server. Note that this will only restore the vzdumps. This can be done by passing the `rehydrate` parameter to the vzbackup-rclone.sh script:
 `$ ~/proxmox-vzbackup-rclone/vzbackup-rclone.sh rehydrate`
 ```
-Please enter the date you want to rehydrate in the following format: YYYY/MM/DD
-For example, today would be: 2020/06/02
-Rehydrate Date => 2020/06/02
-
 2020/06/02 19:41:28 INFO  : Local file system at /mnt/pve/pvebackups01/dump: Waiting for checks to finish
 2020/06/02 19:41:28 INFO  : Local file system at /mnt/pve/pvebackups01/dump: Waiting for transfers to finish
-2020/06/02 19:41:29 INFO  : proxmox_backup_pve-01_2020-06-02.18.42.54.tar.gz: Copied (new)
-2020/06/02 19:41:29 INFO  : proxmox_backup_pve-01_2020-06-02.18.42.29.tar.gz: Copied (new)
-2020/06/02 19:41:29 INFO  : proxmox_backup_pve-01_2020-06-02.18.29.32.tar.gz: Copied (new)
-2020/06/02 19:41:29 INFO  : proxmox_backup_pve-01_2020-06-02.18.43.13.tar.gz: Copied (new)
 2020/06/02 19:41:29 INFO  : vzdump-lxc-121-2020_06_02-18_42_23.tar.zst: Copied (new)
 2020/06/02 19:41:29 INFO  : vzdump-lxc-121-2020_06_02-18_29_25.tar.zst: Copied (new)
 2020/06/02 19:41:29 INFO  : vzdump-lxc-121-2020_06_02-18_43_06.tar.zst: Copied (new)
@@ -112,4 +104,4 @@ Transferred:            8 / 8, 100%
 Elapsed time:        3.6s
 ```
 
-You can do this over as many days as you need. Just make sure your backup storage has the room to hold everything. You can then do a restore like you normally would from the webui or using the vzdump cli.
+Just make sure your backup storage has the room to hold everything. You can then do a restore like you normally would from the webui or using the vzdump cli.

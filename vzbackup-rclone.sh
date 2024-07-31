@@ -1,5 +1,5 @@
 #!/bin/bash
-# ./vzbackup-rclone.sh rehydrate YYYY/MM/DD file_name_encrypted.bin
+# ./vzbackup-rclone.sh rehydrate
 
 ############ /START CONFIG
 dumpdir="/mnt/pve/Samsung-4TB/dump" # Set this to where your vzdump files are stored
@@ -12,21 +12,15 @@ rcloneroot="$dumpdir/rclone"
 timepath="$(date +%Y)/$(date +%m)/$(date +%d)"
 rclonedir="$rcloneroot/$timepath"
 remotevzdumpsdir="vzdumps"
+remoteenvdir="env"
 COMMAND=${1}
-rehydrate=${2} #enter the date you want to rehydrate in the following format: YYYY/MM/DD
-if [ ! -z "${3}" ];then
-        CMDARCHIVE=$(echo "/${3}" | sed -e 's/\(.bin\)*$//g')
-fi
 tarfile=${TARFILE}
 exten=${tarfile#*.}
 filename=${tarfile%.*.*}
 
 if [[ ${COMMAND} == 'rehydrate' ]]; then
-    #echo "Please enter the date you want to rehydrate in the following format: YYYY/MM/DD"
-    #echo "For example, today would be: $timepath"
-    #read -p 'Rehydrate Date => ' rehydrate
     rclone --config /root/.config/rclone/rclone.conf \
-    --drive-chunk-size=32M copy $rcremote:/$rehydrate$CMDARCHIVE/$remotevzdumpsdir $dumpdir \
+    --drive-chunk-size=32M copy $rcremote:/$remotevzdumpsdir $dumpdir \
     -v --stats=60s --transfers=16 --checkers=16
 fi
 
@@ -35,18 +29,8 @@ fi
 #     find $dumpdir -type f -mtime +$MAX_AGE -exec /bin/rm -f {} \;
 # fi
 
-# if [[ ${COMMAND} == 'backup-end' || ${COMMAND} == 'manual-backup' ]]; then
-#     echo "Backing up $tarfile to remote storage"
-#     #mkdir -p $rclonedir
-#     #cp -v $tarfile $rclonedir
-#     echo "rcloning $rclonedir"
-#     #ls $rclonedir
-#     rclone --config /root/.config/rclone/rclone.conf \
-#     --drive-chunk-size=32M copy $tarfile $rcremote:/$timepath \
-#     -v --stats=60s --transfers=16 --checkers=16
-# fi
 
-if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'full-backup' ]]; then
+if [[ ${COMMAND} == 'env-backup' || ${COMMAND} == 'full-backup' ]]; then
     echo "Backing up main PVE configs"
     
     echo "Creating ramdisk to hold the backup files"
@@ -77,28 +61,20 @@ if [[ ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' || ${COMMAND} == 'fu
     # archive the copied system files
     tar -cvzPf "$_filename4" $_tdir/*.tar
 
-    # copy config archive to backup folder
-    #mkdir -p $rclonedir
-    # cp -v $_filename4 $_bdir/
-    #cp -v $_filename4 $rclonedir/
-
     currentDir=${pwd}
     cd $_tdir
     echo "rcloning $_filename4"
-    #ls $rclonedir
     rclone --config /root/.config/rclone/rclone.conf \
-    --drive-chunk-size=32M move $_filename4 $rcremote:/$timepath \
+    --drive-chunk-size=32M move $_filename4 $rcremote:/$remoteenvdir \
     -v --stats=60s --transfers=16 --checkers=16
     cd $currentDir
-    #rm -rfv $rcloneroot
 
     umount /mnt/ramdisk/
 fi
 
-if [[ ${COMMAND} == 'full-backup' || ${COMMAND} == 'vzdumps-backup' ]]; then
+if [[ ${COMMAND} == 'vzdumps-backup' || ${COMMAND} == 'full-backup' || ${COMMAND} == 'job-end' ||  ${COMMAND} == 'job-abort' ]]; then
     # Upload vzdumps
     cd $dumpdir
-    timepathSnapshot="$timepath"
     echo "rcloning vzdumps"
 
     rclone_upload () {
@@ -106,7 +82,7 @@ if [[ ${COMMAND} == 'full-backup' || ${COMMAND} == 'vzdumps-backup' ]]; then
             [ -f "$i" ] || break
             echo "rcloning $i"
             rclone --config /root/.config/rclone/rclone.conf \
-                    --drive-chunk-size=32M copy $i $rcremote:/$timepathSnapshot/$remotevzdumpsdir \
+                    --drive-chunk-size=32M copy $i $rcremote:/$remotevzdumpsdir \
                     -v --stats=60s --transfers=16 --checkers=16
         done
     }
