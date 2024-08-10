@@ -2,7 +2,7 @@
 # ./vzbackup-rclone.sh rehydrate
 
 ############ /START CONFIG
-dumpdir="/mnt/pve/Samsung-4TB/dump" # Set this to where your vzdump files are stored
+dumpdir="/mnt/pve/backups/dump" # Set this to where your vzdump files are stored
 rcremote="pcloud" # Set this to your rclone remote
 # MAX_AGE=3 # This is the age in days to keep local backup copies. Local backups older than this are deleted.
 ############ /END CONFIG
