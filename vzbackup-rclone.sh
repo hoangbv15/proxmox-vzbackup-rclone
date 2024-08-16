@@ -89,5 +89,4 @@ if [[ ${COMMAND} == 'dump-backup' || ${COMMAND} == 'full-backup' || ${COMMAND} =
 
     rclone_upload "*.vma.zst"
     rclone_upload "*.notes"
-    rclone_upload "*.log"
 fi
