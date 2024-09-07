@@ -46,26 +46,28 @@ if [[ ${COMMAND} == 'env-backup' || ${COMMAND} == 'full-backup' ]]; then
     trap clean_up EXIT
     _now=$(date +%Y-%m-%d.%H.%M.%S)
     _HOSTNAME=$(hostname -f)
-    _filename1="$_tdir/proxmoxetc.$_now.tar"
-    _filename2="$_tdir/proxmoxpve.$_now.tar"
-    _filename3="$_tdir/proxmoxroot.$_now.tar"
-    _filename4="$_tdir/proxmox_backup_"$_HOSTNAME"_"$_now".tar.gz"
+    _filename1="$_tdir/proxmox_etc.$_now.tar"
+    _filename2="$_tdir/proxmox_pve.$_now.tar"
+    _filename3="$_tdir/proxmox_root.$_now.tar"
+    _filename4="$_tdir/proxmox_gpuroms.$_now.tar"
+    _filename_all="$_tdir/proxmox_backup_"$_HOSTNAME"_"$_now".tar.gz"
 
     echo "Tar files"
     # copy key system files
     tar --warning='no-file-ignored' -cPf "$_filename1" /etc/.
     tar --warning='no-file-ignored' -cPf "$_filename2" /var/lib/pve-cluster/.
     tar --warning='no-file-ignored' -cPf "$_filename3" /root/.
+    tar --warning='no-file-ignored' -cPf "$_filename4" /usr/share/kvm/gpuroms/.
 
     echo "Compressing files"
     # archive the copied system files
-    tar -cvzPf "$_filename4" $_tdir/*.tar
+    tar -cvzPf "$_filename_all" $_tdir/*.tar
 
     currentDir=${pwd}
     cd $_tdir
-    echo "rcloning $_filename4"
+    echo "rcloning $_filename_all"
     rclone --config /root/.config/rclone/rclone.conf \
-    --drive-chunk-size=32M move $_filename4 $rcremote:/$remoteenvdir \
+    --drive-chunk-size=32M move $_filename_all $rcremote:/$remoteenvdir \
     -v --stats=60s --transfers=16 --checkers=16
     cd $currentDir
 
