@@ -61,7 +61,7 @@ if [[ ${COMMAND} == 'env-backup' || ${COMMAND} == 'full-backup' ]]; then
 
     echo "Compressing files"
     # archive the copied system files
-    tar -cvzPf "$_filename_all" $_tdir/*.tar
+    tar -cvzPf "$_filename_all" -C $_tdir/ .
 
     currentDir=${pwd}
     cd $_tdir
