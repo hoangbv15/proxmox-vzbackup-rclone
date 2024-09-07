@@ -1,0 +1,8 @@
+/etc/default/grub
+/etc/modules
+/etc/modprobe.d/
+/etc/logrotate.d/
+/etc/systemd/journald.conf
+/etc/pve/qemu-server/
+/etc/anacrontab
+/usr/share/kvm/gpuroms/
