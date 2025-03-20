@@ -68,7 +68,7 @@ if [[ ${COMMAND} == 'env-backup' || ${COMMAND} == 'full-backup' ]]; then
     echo "rcloning $_filename_all"
     rclone --config /root/.config/rclone/rclone.conf \
     --drive-chunk-size=32M move $_filename_all $rcremote:/$remoteenvdir \
-    -v --stats=60s --transfers=16 --checkers=16
+    -v --stats=60s --transfers=16 --checkers=16 --multi-thread-streams=1
     cd $currentDir
 
     umount /mnt/ramdisk/
@@ -85,7 +85,7 @@ if [[ ${COMMAND} == 'dump-backup' || ${COMMAND} == 'full-backup' || ${COMMAND} =
             echo "rcloning $i"
             rclone --config /root/.config/rclone/rclone.conf \
                     --drive-chunk-size=32M copy $i $rcremote:/$remotevzdumpsdir \
-                    -v --stats=60s --transfers=16 --checkers=16
+                    -v --stats=60s --transfers=16 --checkers=16 --multi-thread-streams=1
         done
     }
 
